@@ -1,6 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
-const ytdl = require('ytdl-core');
 
 const app = express();
 
@@ -309,64 +308,67 @@ WhaleRadarCrypto
   }
 
   // ======================
-  // YOUTUBE DOWNLOADER
   // ======================
+// YOUTUBE DOWNLOADER
+// ======================
 
-  if (
-    text &&
-    (
-      text.includes('youtube.com')
-      ||
-      text.includes('youtu.be')
-    )
-  ) {
+if (
+  text &&
+  (
+    text.includes('youtube.com')
+    ||
+    text.includes('youtu.be')
+  )
+) {
 
-    const joined =
-    await isUserJoined(msg.from.id);
+  const joined =
+  await isUserJoined(msg.from.id);
 
-    if (!joined) {
+  if (!joined) {
 
-      return bot.sendMessage(
-        msg.chat.id,
-        '❌ Join Channel First'
-      );
+    return bot.sendMessage(
+      msg.chat.id,
+      '❌ Join Channel First'
+    );
 
-    }
+  }
 
-    try {
+  try {
 
-      await bot.sendChatAction(
-        msg.chat.id,
-        'upload_video'
-      );
+    await bot.sendChatAction(
+      msg.chat.id,
+      'upload_video'
+    );
 
-      await bot.sendMessage(
-        msg.chat.id,
+    await bot.sendMessage(
+      msg.chat.id,
 `
 ⏳ Processing YouTube Video...
 
 🎥 HD Quality Detection
 `
-      );
+    );
 
-      const info =
-      await ytdl.getInfo(text);
+    // API
+    const api =
+`https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${text}`;
 
-      const format =
-      ytdl.chooseFormat(
-        info.formats,
-        {
-          quality: '18'
-        }
-      );
+    const response =
+    await fetch(api);
 
-      downloadCount++;
+    const data =
+    await response.json();
 
-      await bot.sendVideo(
-        msg.chat.id,
-        format.url,
-        {
-          caption:
+    const videoUrl =
+    data.formats[0].url;
+
+    downloadCount++;
+
+    await bot.sendVideo(
+      msg.chat.id,
+      videoUrl,
+      {
+        caption:
 `
 ╔══════════════════╗
    ✅ YOUTUBE READY
@@ -381,16 +383,36 @@ ${downloadCount}
 🚀 Powered By
 WhaleRadarCrypto
 `,
-          reply_markup: {
-            inline_keyboard: [
-              [
-                {
-                  text: '📢 Join Channel',
-                  url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
-                }
-              ]
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: '📢 Join Channel',
+                url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
+              }
             ]
-          }
+          ]
+        }
+      }
+    );
+
+  } catch (err) {
+
+    console.log(err);
+
+    await bot.sendMessage(
+      msg.chat.id,
+`
+❌ YouTube Download Failed
+
+⚠️ Video May Be Private
+🔁 Try Another Link
+`
+    );
+
+  }
+
+}
         }
       );
 
