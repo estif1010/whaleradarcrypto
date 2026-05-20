@@ -224,9 +224,26 @@ bot.on('message', async (msg) => {
     if (!joined) {
 
       return bot.sendMessage(
-        msg.chat.id,
-        '❌ Join Channel First'
-      );
+  msg.chat.id,
+`
+❌ Join Channel First
+
+👇 Join To Continue
+`,
+  {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: '📢 Join Channel',
+            url:
+`https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
+          }
+        ]
+      ]
+    }
+  }
+);
 
     }
 
