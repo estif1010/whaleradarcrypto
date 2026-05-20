@@ -1,5 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
+const axios = require('axios');
 
 const app = express();
 
@@ -18,47 +19,67 @@ bot.onText(/\/start/, (msg) => {
 
   bot.sendMessage(
     msg.chat.id,
-    '🐋 WhaleRadarCrypto Active'
+    '🐋 WhaleRadarCrypto ETH Tracker Active'
   );
 
 });
 
-// WHALE COMMAND
+// TEST COMMAND
 bot.onText(/\/whale/, async (msg) => {
+
+  checkETHWhales();
+
+});
+
+// ETH WHALE TRACKER
+async function checkETHWhales() {
 
   try {
 
-    await bot.sendMessage(
-      process.env.CHANNEL_ID,
-      '🚨 Whale Alert Working'
+    const response =
+    await axios.get(
+`https://api.etherscan.io/api?module=account&action=txlist&address=0x28C6c06298d514Db089934071355E5743bf21d60&startblock=0&endblock=99999999&page=1&offset=5&sort=desc&apikey=${process.env.ETHERSCAN_API_KEY}`
     );
 
-    bot.sendMessage(
-      msg.chat.id,
-      '✅ Sent Successfully'
-    );
+    const txs = response.data.result;
+
+    for (const tx of txs) {
+
+      const ethValue =
+      Number(tx.value) / 1e18;
+
+      // FILTER
+      if (ethValue >= 100) {
+
+        const message = `
+🚨 ETH Whale Alert
+
+🐋 ${ethValue.toFixed(2)} ETH moved
+
+📤 ${tx.from.slice(0,6)}...
+📥 ${tx.to.slice(0,6)}...
+
+⛽ Gas Used:
+${tx.gasUsed}
+
+🔗 Ethereum Network
+`;
+
+        await bot.sendMessage(
+          process.env.CHANNEL_ID,
+          message
+        );
+
+      }
+
+    }
 
   } catch (err) {
 
     console.log(err);
 
-    bot.sendMessage(
-      msg.chat.id,
-      '❌ Error'
-    );
-
   }
 
-});
+}
 
-// PORT
-const PORT =
-process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-
-  console.log(
-    `Server running on ${PORT}`
-  );
-
-});
+//
