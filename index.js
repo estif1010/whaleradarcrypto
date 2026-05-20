@@ -1,6 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
-const axios = require('axios');
 
 const app = express();
 
@@ -9,7 +8,7 @@ const app = express();
 // ======================
 
 app.get('/', (req, res) => {
-  res.send('🐋 WhaleRadarCrypto Running');
+  res.send('TikTok Downloader Bot Running');
 });
 
 // ======================
@@ -50,163 +49,86 @@ bot.onText(/\/start/, async (msg) => {
   await bot.sendMessage(
     msg.chat.id,
 `
-🐋 WhaleRadarCrypto Active
+🎬 TikTok Downloader Bot
 
-✅ ETH Whale Tracking
-✅ TRON USDT Tracking
-✅ Exchange Flow Alerts
-✅ Auto Channel Posting
-✅ Multi Chain Monitoring
+✅ Send TikTok Video Link
+✅ Download Without Watermark
+✅ Fast Download
+✅ HD Quality
+
+📥 Paste TikTok URL Now
 `
   );
 
 });
 
 // ======================
-// MANUAL TEST
+// TIKTOK LINK DETECTION
 // ======================
 
-bot.onText(/\/whale/, async (msg) => {
+bot.on('message', async (msg) => {
 
-  await bot.sendMessage(
-    process.env.CHANNEL_ID,
-`
-🚨 Whale Alert Test
+  const text = msg.text;
 
-🐋 1,500 ETH moved
+  if (
+    text &&
+    (
+      text.includes('tiktok.com')
+      ||
+      text.includes('vm.tiktok.com')
+    )
+  ) {
 
-📤 Unknown Wallet
-📥 Binance
-`
-  );
+    try {
+
+      await bot.sendMessage(
+        msg.chat.id,
+        '⏳ Downloading Video...'
+      );
+
+      // FREE TIKTOK DOWNLOAD API
+      const api =
+`https://tikwm.com/api/?url=${encodeURIComponent(text)}`;
+
+      const response =
+      await fetch(api);
+
+      const data =
+      await response.json();
+
+      // VIDEO URL
+      const videoUrl =
+      data.data.play;
+
+      // SEND VIDEO
+      await bot.sendVideo(
+        msg.chat.id,
+        videoUrl,
+        {
+          caption:
+`✅ Downloaded Successfully
+
+⚡ Powered By Your Bot`
+        }
+      );
+
+    } catch (err) {
+
+      console.log(err);
+
+      await bot.sendMessage(
+        msg.chat.id,
+        '❌ Failed To Download Video'
+      );
+
+    }
+
+  }
 
 });
 
 // ======================
-// ETH WHALE TRACKER
-// ======================
-
-async function checkETHWhales() {
-
-  try {
-
-    const response =
-    await axios.get(
-`https://api.etherscan.io/api?module=account&action=txlist&address=0x28C6c06298d514Db089934071355E5743bf21d60&startblock=0&endblock=99999999&page=1&offset=3&sort=desc&apikey=${process.env.ETHERSCAN_API_KEY}`
-    );
-
-    const txs = response.data.result;
-
-    for (const tx of txs) {
-
-      const ethValue =
-      Number(tx.value) / 1e18;
-
-      // FILTER
-      if (ethValue >= 100) {
-
-        const message = `
-🚨 ETH Whale Alert
-
-🐋 ${ethValue.toFixed(2)} ETH moved
-
-📤 ${tx.from.slice(0,6)}...
-📥 ${tx.to.slice(0,6)}...
-
-⛽ Gas:
-${tx.gasUsed}
-
-🔗 Ethereum Network
-`;
-
-        await bot.sendMessage(
-          process.env.CHANNEL_ID,
-          message
-        );
-
-      }
-
-    }
-
-  } catch (err) {
-
-    console.log(err);
-
-  }
-
-}
-
-// ======================
-// TRON USDT TRACKER
-// ======================
-
-async function checkTRONWhales() {
-
-  try {
-
-    const response =
-    await axios.get(
-'https://api.trongrid.io/v1/accounts/TMwFHYXLJaRUPeW6421aqXL4ZEzPRFGkGT/transactions/trc20'
-    );
-
-    const txs = response.data.data;
-
-    for (const tx of txs) {
-
-      const value =
-      Number(tx.value) / 1e6;
-
-      // FILTER
-      if (value >= 100000) {
-
-        const message = `
-🚨 USDT Whale Alert
-
-💵 ${value.toLocaleString()} USDT moved
-
-📤 ${tx.from.slice(0,6)}...
-📥 ${tx.to.slice(0,6)}...
-
-🔗 TRON Network
-`;
-
-        await bot.sendMessage(
-          process.env.CHANNEL_ID,
-          message
-        );
-
-      }
-
-    }
-
-  } catch (err) {
-
-    console.log(err);
-
-  }
-
-}
-
-// ======================
-// AUTO TRACKING
-// ======================
-
-// ETH CHECK
-setInterval(() => {
-
-  checkETHWhales();
-
-}, 300000);
-
-// TRON CHECK
-setInterval(() => {
-
-  checkTRONWhales();
-
-}, 300000);
-
-// ======================
-// SERVER PORT
+// PORT
 // ======================
 
 const PORT =
@@ -215,7 +137,7 @@ process.env.PORT || 3000;
 app.listen(PORT, () => {
 
   console.log(
-    `🚀 Server Running On Port ${PORT}`
+    `🚀 Server Running On ${PORT}`
   );
 
 });
