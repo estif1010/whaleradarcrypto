@@ -1,5 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
+const youtubedl = require('youtube-dl-exec');
 
 const app = express();
 
@@ -8,7 +9,7 @@ const app = express();
 // ======================
 
 app.get('/', (req, res) => {
-  res.send('WhaleRadarCrypto Downloader Bot Running');
+  res.send('WhaleRadarCrypto Bot Running');
 });
 
 // ======================
@@ -96,7 +97,8 @@ bot.onText(/\/start/, async (msg) => {
             [
               {
                 text: '📢 Join Channel',
-                url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
+                url:
+`https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
               }
             ],
             [
@@ -122,8 +124,8 @@ bot.onText(/\/start/, async (msg) => {
 
 ✅ TikTok Downloader
 ✅ YouTube Downloader
-✅ No Watermark
 ✅ HD Quality
+✅ Fast Download
 
 📥 Send Video Link Now
 `,
@@ -133,7 +135,8 @@ bot.onText(/\/start/, async (msg) => {
           [
             {
               text: '📢 Official Channel',
-              url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
+              url:
+`https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
             }
           ]
         ]
@@ -275,18 +278,8 @@ bot.on('message', async (msg) => {
 ${downloadCount}
 
 🚀 Powered By
-WhaleRadarCrypto
-`,
-          reply_markup: {
-            inline_keyboard: [
-              [
-                {
-                  text: '📢 Join Channel',
-                  url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
-                }
-              ]
-            ]
-          }
+Espark downloader 
+`
         }
       );
 
@@ -308,104 +301,80 @@ WhaleRadarCrypto
   }
 
   // ======================
+  // YOUTUBE DOWNLOADER
   // ======================
-// ======================
-// ======================
-// YOUTUBE DOWNLOADER
-// ======================
 
-if (
-  text &&
-  (
-    text.includes('youtube.com')
-    ||
-    text.includes('youtu.be')
-  )
-) {
+  if (
+    text &&
+    (
+      text.includes('youtube.com')
+      ||
+      text.includes('youtu.be')
+    )
+  ) {
 
-  const joined =
-  await isUserJoined(msg.from.id);
+    const joined =
+    await isUserJoined(msg.from.id);
 
-  if (!joined) {
+    if (!joined) {
 
-    return bot.sendMessage(
-      msg.chat.id,
-      '❌ Join Channel First'
-    );
+      return bot.sendMessage(
+        msg.chat.id,
+        '❌ Join Channel First'
+      );
 
-  }
+    }
 
-  try {
+    try {
 
-    await bot.sendMessage(
-      msg.chat.id,
+      await bot.sendChatAction(
+        msg.chat.id,
+        'upload_video'
+      );
+
+      await bot.sendMessage(
+        msg.chat.id,
+`
+⏳ Processing YouTube Video...
+
+🎥 Fetching HD Quality
+`
+      );
+
+      const info =
+      await youtubedl(
+        text,
+        {
+          dumpSingleJson: true,
+          noWarnings: true,
+          preferFreeFormats: true
+        }
+      );
+
+      const videoUrl =
+      info.url;
+
+      downloadCount++;
+
+      await bot.sendVideo(
+        msg.chat.id,
+        videoUrl,
+        {
+          caption:
 `
 ╔══════════════════╗
-   🎬 YOUTUBE DOWNLOADER
+   ✅ YOUTUBE READY
 ╚══════════════════╝
 
-✅ Video Detected
-⚡ Ready To Download
-
-👇 Press Button Below
-`
-    );
-
-    // DOWNLOAD WEBSITE
-    const downloadUrl =
-`https://ssyoutube.com/watch?v=${text}`;
-
-    downloadCount++;
-
-    await bot.sendMessage(
-      msg.chat.id,
-`
-✅ DOWNLOAD READY
+🎥 HD Quality
+⚡ Fast Download
 
 📥 Total Downloads:
 ${downloadCount}
 
 🚀 Powered By
-WhaleRadarCrypto
-`,
-      {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              {
-                text: '⬇️ Download YouTube Video',
-                url:
-`https://en.savefrom.net/1-youtube-video-downloader-533nN/${encodeURIComponent(text)}`
-              }
-            ],
-            [
-              {
-                text: '📢 Join Channel',
-                url:
-`https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
-              }
-            ]
-          ]
-        }
-      }
-    );
-
-  } catch (err) {
-
-    console.log(err);
-
-    await bot.sendMessage(
-      msg.chat.id,
+Espark downloader 
 `
-❌ Download Failed
-
-⚠️ Try Another Link
-`
-    );
-
-  }
-
-}
         }
       );
 
@@ -418,7 +387,8 @@ WhaleRadarCrypto
 `
 ❌ YouTube Download Failed
 
-⚠️ Try Another Link
+⚠️ Video May Be Restricted
+🔁 Try Another Link
 `
       );
 
@@ -427,7 +397,7 @@ WhaleRadarCrypto
   }
 
   // ======================
-  // USERNAME SEARCH
+  // TIKTOK USERNAME SEARCH
   // ======================
 
   if (
@@ -478,10 +448,14 @@ WhaleRadarCrypto
 const PORT =
 process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+app.listen(
+  PORT,
+  '0.0.0.0',
+  () => {
 
-  console.log(
-    `🚀 Server Running On ${PORT}`
-  );
+    console.log(
+      `🚀 Server Running On ${PORT}`
+    );
 
-});
+  }
+);
