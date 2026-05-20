@@ -16,29 +16,34 @@ bot.onText(/\/start/, (msg) => {
 
 bot.sendMessage(
 msg.chat.id,
-'🐋 WhaleRadarCrypto Active'
+'🐋 WhaleRadarCrypto Tracking Active'
 );
 
 });
 
-// TEST SIGNAL
-bot.onText(/\/test/, async (msg) => {
+// TEST WHALE ALERT
+bot.onText(/\/whale/, async (msg) => {
+
+const message = `
+🚨 Whale Transfer Detected
+
+🐋 12,500 ETH moved
+
+📤 Unknown Wallet
+📥 Binance
+
+💰 Estimated Value:
+$45,000,000
+`;
 
 await bot.sendMessage(
 CHANNEL_ID,
-`
-🚨 Whale Alert
-
-🐋 5,000 BTC moved
-
-📥 Binance
-💰 $320M
-`
+message
 );
 
 bot.sendMessage(
 msg.chat.id,
-'✅ Signal Sent'
+'✅ Whale Alert Sent'
 );
 
 });
