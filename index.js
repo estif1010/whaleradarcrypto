@@ -1,30 +1,46 @@
 require('dotenv').config();
 
-const TelegramBot =
-require('node-telegram-bot-api');
+const TelegramBot = require('node-telegram-bot-api');
+const express = require('express');
 
+const app = express();
+
+// TELEGRAM BOT
 const bot = new TelegramBot(
-process.env.BOT_TOKEN,
-{ polling: true }
+  process.env.BOT_TOKEN,
+  { polling: true }
 );
 
-const CHANNEL_ID =
-process.env.CHANNEL_ID;
+// CHANNEL ID
+const CHANNEL_ID = process.env.CHANNEL_ID;
 
-// START
+// WEB SERVER
+app.get('/', (req, res) => {
+  res.send('🐋 WhaleRadarCrypto Bot Running');
+});
+
+// START COMMAND
 bot.onText(/\/start/, (msg) => {
 
-bot.sendMessage(
-msg.chat.id,
-'🐋 WhaleRadarCrypto Tracking Active'
-);
+  bot.sendMessage(
+    msg.chat.id,
+    `
+🐋 WhaleRadarCrypto Active
+
+✅ Multi Chain Tracking
+✅ Exchange Flow Alerts
+✅ Auto Channel Posting
+`
+  );
 
 });
 
 // TEST WHALE ALERT
 bot.onText(/\/whale/, async (msg) => {
 
-const message = `
+  try {
+
+    const message = `
 🚨 Whale Transfer Detected
 
 🐋 12,500 ETH moved
@@ -36,14 +52,13 @@ const message = `
 $45,000,000
 `;
 
-await bot.sendMessage(
-CHANNEL_ID,
-message
-);
+    // SEND TO CHANNEL
+    await bot.sendMessage(
+      CHANNEL_ID,
+      message
+    );
 
-bot.sendMessage(
-msg.chat.id,
-'✅ Whale Alert Sent'
-);
-
-});
+    // SEND TO USER
+    await bot.sendMessage(
+      msg.chat.id,
+      '✅ Whale Alert Sent To Channel'
