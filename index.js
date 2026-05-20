@@ -8,7 +8,7 @@ const app = express();
 // ======================
 
 app.get('/', (req, res) => {
-  res.send('TikTok Downloader Bot Running');
+  res.send('WhaleRadarCrypto TikTok Bot Running');
 });
 
 // ======================
@@ -19,7 +19,10 @@ const bot = new TelegramBot(
   process.env.BOT_TOKEN
 );
 
-// SAFE POLLING
+// ======================
+// START BOT
+// ======================
+
 async function startBot() {
 
   try {
@@ -41,29 +44,160 @@ async function startBot() {
 startBot();
 
 // ======================
+// FORCE JOIN CHECK
+// ======================
+
+async function isUserJoined(userId) {
+
+  try {
+
+    const member =
+    await bot.getChatMember(
+      process.env.CHANNEL_USERNAME,
+      userId
+    );
+
+    return (
+      member.status === 'member' ||
+      member.status === 'administrator' ||
+      member.status === 'creator'
+    );
+
+  } catch (err) {
+
+    return false;
+
+  }
+
+}
+
+// ======================
 // START COMMAND
 // ======================
 
 bot.onText(/\/start/, async (msg) => {
 
-  await bot.sendMessage(
+  const joined =
+  await isUserJoined(msg.from.id);
+
+  // FORCE JOIN
+  if (!joined) {
+
+    return bot.sendMessage(
+      msg.chat.id,
+`
+🚨 Join Our Channel First
+
+👇 Then Use The Bot
+`,
+      {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: '📢 Join Channel',
+                url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
+              }
+            ],
+            [
+              {
+                text: '✅ Joined',
+                callback_data: 'check_join'
+              }
+            ]
+          ]
+        }
+      }
+    );
+
+  }
+
+  // WELCOME MESSAGE
+  await bot.sendPhoto(
     msg.chat.id,
+    'https://i.imgur.com/2WZtOD6.jpeg',
+    {
+      caption:
 `
-🎬 TikTok Downloader Bot
+╔══════════════╗
+    🎬 TIKTOK DOWNLOADER
+╚══════════════╝
 
-✅ Send TikTok Video Link
-✅ Download Without Watermark
-✅ Fast Download
-✅ HD Quality
+⚡ Fast Downloads
+💎 No Watermark
+🎥 HD Quality
+📥 Unlimited Usage
 
-📥 Paste TikTok URL Now
-`
+🚀 Send TikTok Link Now
+`,
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: '📢 Official Channel',
+              url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
+            }
+          ]
+        ]
+      }
+    }
   );
 
 });
 
 // ======================
-// TIKTOK LINK DETECTION
+// CHECK JOIN BUTTON
+// ======================
+
+bot.on('callback_query', async (query) => {
+
+  if (query.data === 'check_join') {
+
+    const joined =
+    await isUserJoined(query.from.id);
+
+    if (!joined) {
+
+      return bot.answerCallbackQuery(
+        query.id,
+        {
+          text:
+'❌ You Must Join Channel First',
+          show_alert: true
+        }
+      );
+
+    }
+
+    await bot.answerCallbackQuery(
+      query.id,
+      {
+        text:
+'✅ Access Granted'
+      }
+    );
+
+    await bot.sendMessage(
+      query.message.chat.id,
+`
+✅ You Can Now Use The Bot
+
+📥 Send TikTok Link
+`
+    );
+
+  }
+
+});
+
+// ======================
+// DOWNLOAD COUNTER
+// ======================
+
+let downloadCount = 0;
+
+// ======================
+// MESSAGE HANDLER
 // ======================
 
 bot.on('message', async (msg) => {
@@ -79,14 +213,36 @@ bot.on('message', async (msg) => {
     )
   ) {
 
+    const joined =
+    await isUserJoined(msg.from.id);
+
+    if (!joined) {
+
+      return bot.sendMessage(
+        msg.chat.id,
+        '❌ Join Channel First'
+      );
+
+    }
+
     try {
+
+      // TYPING EFFECT
+      await bot.sendChatAction(
+        msg.chat.id,
+        'upload_video'
+      );
 
       await bot.sendMessage(
         msg.chat.id,
-        '⏳ Downloading Video...'
+`
+⏳ Processing Video...
+
+⚡ HD Quality Detection
+`
       );
 
-      // FREE TIKTOK DOWNLOAD API
+      // API
       const api =
 `https://tikwm.com/api/?url=${encodeURIComponent(text)}`;
 
@@ -96,9 +252,10 @@ bot.on('message', async (msg) => {
       const data =
       await response.json();
 
-      // VIDEO URL
       const videoUrl =
       data.data.play;
+
+      downloadCount++;
 
       // SEND VIDEO
       await bot.sendVideo(
@@ -106,9 +263,30 @@ bot.on('message', async (msg) => {
         videoUrl,
         {
           caption:
-`✅ Downloaded Successfully
+`
+╔══════════════╗
+   ✅ DOWNLOAD READY
+╚══════════════╝
 
-⚡ Powered By espark downloader `
+🎥 HD Quality
+💎 No Watermark
+
+📥 Total Downloads:
+${downloadCount}
+
+🚀 Powered By
+WhaleRadarCrypto
+`,
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: '📢 Join Channel',
+                  url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
+                }
+              ]
+            ]
+          }
         }
       );
 
@@ -118,7 +296,11 @@ bot.on('message', async (msg) => {
 
       await bot.sendMessage(
         msg.chat.id,
-        '❌ Failed To Download Video'
+`
+❌ Download Failed
+
+⚠️ Try Another TikTok Link
+`
       );
 
     }
@@ -128,7 +310,7 @@ bot.on('message', async (msg) => {
 });
 
 // ======================
-// PORT
+// SERVER
 // ======================
 
 const PORT =
