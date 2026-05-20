@@ -309,6 +309,7 @@ WhaleRadarCrypto
 
   // ======================
   // ======================
+// ======================
 // YOUTUBE DOWNLOADER
 // ======================
 
@@ -349,18 +350,27 @@ if (
 `
     );
 
-    // API
-    const api =
-`https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${text}`;
+    // EXTRACT VIDEO ID
+    let videoId = '';
 
-    const response =
-    await fetch(api);
+    if (text.includes('youtu.be/')) {
 
-    const data =
-    await response.json();
+      videoId =
+      text.split('youtu.be/')[1].split('?')[0];
 
+    } else {
+
+      const url =
+      new URL(text);
+
+      videoId =
+      url.searchParams.get('v');
+
+    }
+
+    // DOWNLOAD LINK
     const videoUrl =
-    data.formats[0].url;
+`https://yewtu.be/latest_version?id=${videoId}&itag=18`;
 
     downloadCount++;
 
@@ -388,7 +398,8 @@ WhaleRadarCrypto
             [
               {
                 text: '📢 Join Channel',
-                url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
+                url:
+`https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
               }
             ]
           ]
@@ -405,7 +416,7 @@ WhaleRadarCrypto
 `
 ❌ YouTube Download Failed
 
-⚠️ Video May Be Private
+⚠️ Invalid Or Private Video
 🔁 Try Another Link
 `
     );
