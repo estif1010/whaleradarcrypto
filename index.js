@@ -108,7 +108,7 @@ bot.on('message', async (msg) => {
           caption:
 `✅ Downloaded Successfully
 
-⚡ Powered By Your Bot`
+⚡ Powered By espark downloader `
         }
       );
 
