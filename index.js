@@ -310,6 +310,7 @@ WhaleRadarCrypto
   // ======================
   // ======================
 // ======================
+// ======================
 // YOUTUBE DOWNLOADER
 // ======================
 
@@ -336,56 +337,30 @@ if (
 
   try {
 
-    await bot.sendChatAction(
+    await bot.sendMessage(
       msg.chat.id,
-      'upload_video'
+`
+╔══════════════════╗
+   🎬 YOUTUBE DOWNLOADER
+╚══════════════════╝
+
+✅ Video Detected
+⚡ Ready To Download
+
+👇 Press Button Below
+`
     );
+
+    // DOWNLOAD WEBSITE
+    const downloadUrl =
+`https://ssyoutube.com/watch?v=${text}`;
+
+    downloadCount++;
 
     await bot.sendMessage(
       msg.chat.id,
 `
-⏳ Processing YouTube Video...
-
-🎥 HD Quality Detection
-`
-    );
-
-    // EXTRACT VIDEO ID
-    let videoId = '';
-
-    if (text.includes('youtu.be/')) {
-
-      videoId =
-      text.split('youtu.be/')[1].split('?')[0];
-
-    } else {
-
-      const url =
-      new URL(text);
-
-      videoId =
-      url.searchParams.get('v');
-
-    }
-
-    // DOWNLOAD LINK
-    const videoUrl =
-`https://yewtu.be/latest_version?id=${videoId}&itag=18`;
-
-    downloadCount++;
-
-    await bot.sendVideo(
-      msg.chat.id,
-      videoUrl,
-      {
-        caption:
-`
-╔══════════════════╗
-   ✅ YOUTUBE READY
-╚══════════════════╝
-
-🎥 HD Quality
-⚡ Fast Download
+✅ DOWNLOAD READY
 
 📥 Total Downloads:
 ${downloadCount}
@@ -393,8 +368,16 @@ ${downloadCount}
 🚀 Powered By
 WhaleRadarCrypto
 `,
+      {
         reply_markup: {
           inline_keyboard: [
+            [
+              {
+                text: '⬇️ Download YouTube Video',
+                url:
+`https://en.savefrom.net/1-youtube-video-downloader-533nN/${encodeURIComponent(text)}`
+              }
+            ],
             [
               {
                 text: '📢 Join Channel',
@@ -414,10 +397,9 @@ WhaleRadarCrypto
     await bot.sendMessage(
       msg.chat.id,
 `
-❌ YouTube Download Failed
+❌ Download Failed
 
-⚠️ Invalid Or Private Video
-🔁 Try Another Link
+⚠️ Try Another Link
 `
     );
 
