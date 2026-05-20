@@ -112,12 +112,9 @@ bot.onText(/\/start/, async (msg) => {
 
   }
 
-  // WELCOME IMAGE
-  await bot.sendPhoto(
-    msg.chat.id,
-    'https://images.unsplash.com/photo-1611162617474-5b21e879e113',
-    {
-      caption:
+  // WELCOME MESSAGE
+await bot.sendMessage(
+  msg.chat.id,
 `
 ╔══════════════════╗
    🎬 TIKTOK DOWNLOADER
@@ -130,19 +127,19 @@ bot.onText(/\/start/, async (msg) => {
 
 🚀 Send TikTok Link Now
 `,
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: '📢 Official Channel',
-              url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
-            }
-          ]
+  {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: '📢 Official Channel',
+            url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
+          }
         ]
-      }
+      ]
     }
-  );
-
+  }
+);
 });
 
 // ======================
