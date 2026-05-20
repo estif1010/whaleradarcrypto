@@ -112,16 +112,16 @@ bot.onText(/\/start/, async (msg) => {
 
   }
 
-  // WELCOME MESSAGE
+  // WELCOME IMAGE
   await bot.sendPhoto(
     msg.chat.id,
-    'https://i.imgur.com/2WZtOD6.jpeg',
+    'https://images.unsplash.com/photo-1611162617474-5b21e879e113',
     {
       caption:
 `
-╔══════════════╗
-    🎬 TIKTOK DOWNLOADER
-╚══════════════╝
+╔══════════════════╗
+   🎬 TIKTOK DOWNLOADER
+╚══════════════════╝
 
 ⚡ Fast Downloads
 💎 No Watermark
@@ -227,7 +227,7 @@ bot.on('message', async (msg) => {
 
     try {
 
-      // TYPING EFFECT
+      // UPLOAD EFFECT
       await bot.sendChatAction(
         msg.chat.id,
         'upload_video'
@@ -239,10 +239,11 @@ bot.on('message', async (msg) => {
 ⏳ Processing Video...
 
 ⚡ HD Quality Detection
+💎 Removing Watermark
 `
       );
 
-      // API
+      // TIKTOK API
       const api =
 `https://tikwm.com/api/?url=${encodeURIComponent(text)}`;
 
@@ -264,12 +265,13 @@ bot.on('message', async (msg) => {
         {
           caption:
 `
-╔══════════════╗
-   ✅ DOWNLOAD READY
-╚══════════════╝
+╔══════════════════╗
+    ✅ DOWNLOAD READY
+╚══════════════════╝
 
 🎥 HD Quality
 💎 No Watermark
+⚡ Fast Download
 
 📥 Total Downloads:
 ${downloadCount}
