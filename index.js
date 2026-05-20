@@ -1,5 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
+const ytdl = require('ytdl-core');
 
 const app = express();
 
@@ -8,7 +9,7 @@ const app = express();
 // ======================
 
 app.get('/', (req, res) => {
-  res.send('WhaleRadarCrypto TikTok Bot Running');
+  res.send('WhaleRadarCrypto Downloader Bot Running');
 });
 
 // ======================
@@ -113,37 +114,38 @@ bot.onText(/\/start/, async (msg) => {
   }
 
   // WELCOME MESSAGE
-await bot.sendMessage(
-  msg.chat.id,
+  await bot.sendMessage(
+    msg.chat.id,
 `
 ╔══════════════════╗
-   🎬 TIKTOK DOWNLOADER
+   🎬 MULTI DOWNLOADER
 ╚══════════════════╝
 
-⚡ Fast Downloads
-💎 No Watermark
-🎥 HD Quality
-📥 Unlimited Usage
+✅ TikTok Downloader
+✅ YouTube Downloader
+✅ No Watermark
+✅ HD Quality
 
-🚀 Send TikTok Link Now
+📥 Send Video Link Now
 `,
-  {
-    reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text: '📢 Official Channel',
-            url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
-          }
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: '📢 Official Channel',
+              url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
+            }
+          ]
         ]
-      ]
+      }
     }
-  }
-);
+  );
+
 });
 
 // ======================
-// CHECK JOIN BUTTON
+// JOIN CHECK BUTTON
 // ======================
 
 bot.on('callback_query', async (query) => {
@@ -179,7 +181,7 @@ bot.on('callback_query', async (query) => {
 `
 ✅ You Can Now Use The Bot
 
-📥 Send TikTok Link
+📥 Send Video Link
 `
     );
 
@@ -200,6 +202,10 @@ let downloadCount = 0;
 bot.on('message', async (msg) => {
 
   const text = msg.text;
+
+  // ======================
+  // TIKTOK DOWNLOADER
+  // ======================
 
   if (
     text &&
@@ -224,7 +230,6 @@ bot.on('message', async (msg) => {
 
     try {
 
-      // UPLOAD EFFECT
       await bot.sendChatAction(
         msg.chat.id,
         'upload_video'
@@ -233,14 +238,13 @@ bot.on('message', async (msg) => {
       await bot.sendMessage(
         msg.chat.id,
 `
-⏳ Processing Video...
+⏳ Processing TikTok Video...
 
-⚡ HD Quality Detection
 💎 Removing Watermark
+🎥 HD Quality Detection
 `
       );
 
-      // TIKTOK API
       const api =
 `https://tikwm.com/api/?url=${encodeURIComponent(text)}`;
 
@@ -255,7 +259,6 @@ bot.on('message', async (msg) => {
 
       downloadCount++;
 
-      // SEND VIDEO
       await bot.sendVideo(
         msg.chat.id,
         videoUrl,
@@ -263,18 +266,17 @@ bot.on('message', async (msg) => {
           caption:
 `
 ╔══════════════════╗
-    ✅ DOWNLOAD READY
+   ✅ TIKTOK READY
 ╚══════════════════╝
 
 🎥 HD Quality
 💎 No Watermark
-⚡ Fast Download
 
 📥 Total Downloads:
 ${downloadCount}
 
 🚀 Powered By
-espark downloader
+WhaleRadarCrypto
 `,
           reply_markup: {
             inline_keyboard: [
@@ -296,13 +298,159 @@ espark downloader
       await bot.sendMessage(
         msg.chat.id,
 `
-❌ Download Failed
+❌ TikTok Download Failed
 
-⚠️ Try Another TikTok Link
+⚠️ Try Another Link
 `
       );
 
     }
+
+  }
+
+  // ======================
+  // YOUTUBE DOWNLOADER
+  // ======================
+
+  if (
+    text &&
+    (
+      text.includes('youtube.com')
+      ||
+      text.includes('youtu.be')
+    )
+  ) {
+
+    const joined =
+    await isUserJoined(msg.from.id);
+
+    if (!joined) {
+
+      return bot.sendMessage(
+        msg.chat.id,
+        '❌ Join Channel First'
+      );
+
+    }
+
+    try {
+
+      await bot.sendChatAction(
+        msg.chat.id,
+        'upload_video'
+      );
+
+      await bot.sendMessage(
+        msg.chat.id,
+`
+⏳ Processing YouTube Video...
+
+🎥 HD Quality Detection
+`
+      );
+
+      const info =
+      await ytdl.getInfo(text);
+
+      const format =
+      ytdl.chooseFormat(
+        info.formats,
+        {
+          quality: '18'
+        }
+      );
+
+      downloadCount++;
+
+      await bot.sendVideo(
+        msg.chat.id,
+        format.url,
+        {
+          caption:
+`
+╔══════════════════╗
+   ✅ YOUTUBE READY
+╚══════════════════╝
+
+🎥 HD Quality
+⚡ Fast Download
+
+📥 Total Downloads:
+${downloadCount}
+
+🚀 Powered By
+WhaleRadarCrypto
+`,
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: '📢 Join Channel',
+                  url: `https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
+                }
+              ]
+            ]
+          }
+        }
+      );
+
+    } catch (err) {
+
+      console.log(err);
+
+      await bot.sendMessage(
+        msg.chat.id,
+`
+❌ YouTube Download Failed
+
+⚠️ Try Another Link
+`
+      );
+
+    }
+
+  }
+
+  // ======================
+  // USERNAME SEARCH
+  // ======================
+
+  if (
+    text &&
+    text.startsWith('@')
+  ) {
+
+    const username =
+    text.replace('@', '');
+
+    return bot.sendMessage(
+      msg.chat.id,
+`
+🔍 TikTok Profile Found
+
+👤 Username:
+@${username}
+
+🌐 Open Profile:
+https://www.tiktok.com/@${username}
+
+🚀 Powered By
+WhaleRadarCrypto
+`,
+      {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: '🎬 Open TikTok Profile',
+                url:
+`https://www.tiktok.com/@${username}`
+              }
+            ]
+          ]
+        }
+      }
+    );
 
   }
 
