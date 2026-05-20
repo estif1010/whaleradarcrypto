@@ -261,11 +261,11 @@ bot.on('message', async (msg) => {
 
       downloadCount++;
 
-      await bot.sendVideo(
-        msg.chat.id,
-        videoUrl,
-        {
-          caption:
+   await bot.sendVideo(
+  msg.chat.id,
+  videoUrl,
+  {
+    caption:
 `
 ╔══════════════════╗
    ✅ TIKTOK READY
@@ -278,10 +278,21 @@ bot.on('message', async (msg) => {
 ${downloadCount}
 
 🚀 Powered By
-Espark downloader 
-`
-        }
-      );
+WhaleRadarCrypto
+`,
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: '📢 Join Channel',
+            url:
+`https://t.me/${process.env.CHANNEL_USERNAME.replace('@','')}`
+          }
+        ]
+      ]
+    }
+  }
+);
 
     } catch (err) {
 
