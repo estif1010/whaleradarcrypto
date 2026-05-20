@@ -5,42 +5,26 @@ const app = express();
 
 // EXPRESS SERVER
 app.get('/', (req, res) => {
-  res.send('WhaleRadarCrypto Running');
+  res.send('🐋 WhaleRadarCrypto Running');
 });
 
 // CREATE BOT
 const bot = new TelegramBot(
-  process.env.BOT_TOKEN,
-  { polling: false }
+  process.env.BOT_TOKEN
 );
 
-// START POLLING SAFELY
-bot.startPolling();
-
-// START COMMAND
-bot.onText(/\/start/, (msg) => {
-
-  bot.sendMessage(
-    msg.chat.id,
-    '🐋 WhaleRadarCrypto Active'
-  );
-
-});
-
-// WHALE COMMAND
-bot.onText(/\/whale/, async (msg) => {
+// SAFE POLLING START
+async function startBot() {
 
   try {
 
-    await bot.sendMessage(
-      process.env.CHANNEL_ID,
-      '🚨 ETH Whale Alert'
-    );
+    // CLEAR OLD WEBHOOK/POLLING
+    await bot.deleteWebHook();
 
-    await bot.sendMessage(
-      msg.chat.id,
-      '✅ Sent Successfully'
-    );
+    // START NEW POLLING
+    await bot.startPolling();
+
+    console.log('✅ Bot Started');
 
   } catch (err) {
 
@@ -48,16 +32,25 @@ bot.onText(/\/whale/, async (msg) => {
 
   }
 
-});
+}
 
-// PORT
-const PORT =
-process.env.PORT || 3000;
+startBot();
 
-app.listen(PORT, () => {
+// START COMMAND
+bot.onText(/\/start/, async (msg) => {
 
-  console.log(
-    `Server running on ${PORT}`
+  await bot.sendMessage(
+    msg.chat.id,
+`
+🐋 WhaleRadarCrypto Active
+
+✅ Auto Channel Posting
+✅ ETH Whale Tracking
+✅ Exchange Flow Monitoring
+`
   );
 
 });
+
+// WHALE COMMAND
+bot.onText(/\/
