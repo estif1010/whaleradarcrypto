@@ -277,7 +277,7 @@ bot.on('message', async (msg) => {
 ${downloadCount}
 
 🚀 Powered By
-WhaleRadarCrypto
+espark downloader
 `,
           reply_markup: {
             inline_keyboard: [
